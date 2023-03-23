@@ -5,6 +5,8 @@
     unsafe_op_in_unsafe_fn
 )]
 
+use core::arch::asm;
+
 use std::io;
 use std::marker::PhantomData;
 use std::ops::Add;
@@ -95,8 +97,12 @@ impl Port {
 
     /// Writes a byte to the port.
     fn write_byte(&mut self, value: u8) {
-        // SAFETY: `self` ensures that this thread has gained access to the underlying port.
-        unsafe { x86::io::outb(self.address, value) };
+        // SAFETY: `self` ensures that this thread has access to the underlying port: the necessary
+        // permission bit has been set (with `ioperm`), and accessing this port was deemed safe.
+        unsafe {
+            // Note: memory mapped I/O is a thing, so don't add options(nomem).
+            asm!("out dx, al", in("dx") self.address, in("al") value, options(nostack, preserves_flags));
+        };
     }
 }
 

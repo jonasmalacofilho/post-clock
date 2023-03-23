@@ -15,7 +15,6 @@ anyhow = "1.0.70"
 capctl = "0.2.2"
 chrono = { version = "0.4.24", features = ["clock"], default-features = false }
 libc = "0.2.140"
-x86 = "0.52.0"
 
 [profile.release]
 codegen-units = 1
