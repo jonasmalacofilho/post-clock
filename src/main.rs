@@ -29,14 +29,9 @@ fn main() -> Result<()> {
     // we checked that the kernel isn't using port 0x80 for io_delay.
     let mut port = unsafe { Port::new(0x80).context("access to port 0x80 was denied")? };
 
-    // Drop all permitted, inherittable and effective capabilities.
-    //
-    // Note that, in general, this alone isn't sufficient to prevent this thread from regaining
-    // capabilities due to the special treatment of processes with UID 0: see `capabilities(7)`.
-    //
-    // Those corner cases are left to be handled by PID 0, which should be configured to run this
-    // program under a unprivileged user, with a limited bounding set, and with `NO_SETUID_FIXUP`
-    // and `NOROOT` secure bits set and locked; `KEEP_CAPS` should also be locked.
+    // Drop all permitted, inherittable and effective capabilities. Note that this alone doesn't
+    // prevent this thread from regaining capabilities due to the special treatment of processes
+    // with UID 0; see `capabilities(7)` and the provided `post-clock.service` for systemd.
     CapState::empty()
         .set_current()
         .context("failed to clear capabilities")?;
