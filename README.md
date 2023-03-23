@@ -45,8 +45,9 @@ delay mechanism.
 Additionally, the motherboard should be configured _not_ to output other information to that display once
 the system has booted.
 
-Finally, `post-clock` requires the `CAP_SYS_RAWIO` capability. Alternatively, it can be executed as
-root.
+Finally, the `CAP_SYS_RAWIO` capability is required for the [`ioperm(2)`][man:ioperm] system call;
+`post-clock` will drop it and any other capabilities before entering its main loop. (Alternatively,
+`post-clock` can be executed as root).
 
 ## Installation
 
@@ -84,5 +85,6 @@ Then, enable and start the service:
 [^2]: https://www.kernel.org/doc/html/latest/admin-guide/kernel-parameters.html
 
 [.service]: ./post-clock.service
+[man:ioperm]: https://man7.org/linux/man-pages/man2/ioperm.2.html
 [man:systemd.unit]: https://man7.org/linux/man-pages/man5/systemd.unit.5.html
 [pkg:aur]: https://aur.archlinux.org/packages/post-clock
