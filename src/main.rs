@@ -15,7 +15,7 @@ use std::time::Duration;
 
 use anyhow::{bail, Context, Result};
 use capctl::caps::CapState;
-use chrono::{Local, Timelike};
+use time::OffsetDateTime;
 
 // io_delay_type values are defined in:
 // https://elixir.bootlin.com/linux/v6.2.6/source/arch/x86/kernel/io_delay.c#L16
@@ -39,12 +39,13 @@ fn main() -> Result<()> {
         .context("failed to clear capabilities")?;
 
     loop {
-        let now = Local::now();
+        let now = OffsetDateTime::now_local()?;
 
-        // Travel forward into the future so that `(now.hour(), now.minute())` remains accurate
-        // to/for half a minute, without additional calls to `Local::now()`.
-        let now = now.add(chrono::Duration::seconds(30));
+        // Travel forward into the future so that `(now.hour(), now.minute())` is rounded to the
+        // nearest minute.
+        let now = now.add(Duration::from_secs(30));
 
+        // Only update the current time every 30 seconds.
         for _ in 0..10 {
             port.write_byte(seven_segments(now.hour()));
             thread::sleep(Duration::from_secs(1));
@@ -111,10 +112,8 @@ impl Port {
 /// # Panics
 ///
 /// If `debug_assertions` are enabled, panics if `number` has more than two decimal digits.
-fn seven_segments(number: u32) -> u8 {
+fn seven_segments(number: u8) -> u8 {
     debug_assert!(number <= 99);
-    let number: u8 = number as _;
-
     (number / 10) << 4 | (number % 10)
 }
 
