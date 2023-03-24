@@ -14,7 +14,7 @@ const IO_DELAY_TYPE_0X80: u8 = 0;
 
 /// Model a 2-digit seven-segment display for POST codes from I/O port 0x80.
 ///
-/// Access permission bits to I/O ports are per thread, so this type is `!Send` and `!Sync`.
+/// Access permission bits to I/O ports are per thread, so this type is neither `Send` nor `Sync`.
 pub struct Display(PhantomData<*mut ()>);
 
 impl Display {
@@ -36,11 +36,20 @@ impl Display {
 
     /// Displays a hexadecimal value.
     pub fn hexadecimal(&mut self, value: u8) {
-        // SAFETY: `self` ensures that this thread has access to the underlying port: the necessary
-        // permission bit has been set (with `ioperm`), and accessing this port was deemed safe.
+        // SAFETY: `self` ensures that this thread has access to port 0x80; `out` doesn't clobber
+        // registers or flags, or accesses memory[^1].
+        //
+        // [^1]: Except if memory-mapped I/O is used, but that would require `unsafe` block
+        // elsewheres, or access to `/dev/port` (the latter is a sibling of `/dev/mem`, which is
+        // generally accepted to be outside of the Rust memory safety garantees, otherwise all file
+        // I/O would be unsafe).
         unsafe {
-            // Note: memory mapped I/O is a thing, so don't add options(nomem).
-            asm!("out dx, al", in("dx") PORT_0X80, in("al") value, options(nostack, preserves_flags));
+            asm!(
+                "out dx, al",
+                in("dx") PORT_0X80,
+                in("al") value,
+                options(nomem, nostack, preserves_flags)
+            );
         };
     }
 
