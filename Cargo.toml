@@ -6,7 +6,8 @@ edition = "2021"
 description = "A clock using the POST codes display"
 repository = "https://github.com/jonasmalacofilho/post-clock"
 license = "Unlicense"
-publish = false
+keywords = ["x86", "x86_64", "power-on-self-test", "clock"]
+categories = ["command-line-utilities", "hardware-support"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
