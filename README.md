@@ -65,10 +65,10 @@ Instead, the recommended way to manually install post-clock is to clone the repo
 release tag, build with cargo, and copy the resulting executable to the desired location:
 
 ```
-$ git clone https://github.com/jonasmalacofilho/post-clock --branch v0.1.1
-$ cd post-clock
-$ cargo build --release
-$ sudo install -Dm0755 -t /usr/local/bin/ target/release/post-clock
+git clone https://github.com/jonasmalacofilho/post-clock --branch v0.1.1
+cd post-clock
+cargo build --release
+sudo install -Dm0755 -t /usr/local/bin/ target/release/post-clock
 ```
 
 ## Running as a service
@@ -77,14 +77,14 @@ A systemd system service file is provided in [`post-clock.service`][.service]. A
 to a suitable location,[^4] reload all unit files:
 
 ```
-$ sudo install -Dm0644 -t /etc/systemd/system/ post-clock.service
-$ sudo systemctl daemon-reload
+sudo install -Dm0644 -t /etc/systemd/system/ post-clock.service
+sudo systemctl daemon-reload
 ```
 
 Then, enable and start the service:
 
 ```
-$ sudo systemctl enable --now post-clock.service
+sudo systemctl enable --now post-clock.service
 ```
 
 [^1]: http://www.faqs.org/docs/Linux-mini/IO-Port-Programming.html
