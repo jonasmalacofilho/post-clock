@@ -1,6 +1,6 @@
 # post-clock
 
-Once a system has booted, use the display for POST diagnostic codes as a clock.
+_Once a system has booted, use the display for POST diagnostic codes as a clock._
 
 ## Background on POST diagnostic codes
 
@@ -51,7 +51,7 @@ system has booted.
 
 And, finally, the `CAP_SYS_RAWIO` capability is required for the [`ioperm(2)`][man:ioperm] system
 call (post-clock will drop it and any other capabilities before entering its main loop).
-Alternatively, post-clock can be executed as root.
+Alternatively, post-clock may be executed as root.
 
 ## Linux packages
 
@@ -66,8 +66,8 @@ installed in a user-writable location. Therefore, simply running `cargo install 
 recommended. And while it's possible to specify a different installation path, for example with
 `--root /usr/local/bin`, it would also _build_ post-clock as root, which isn't ideal.
 
-Instead, the recommended way to manually install post-clock is to clone the repository at the latest
-release tag, build with cargo, and copy the resulting executable to the desired location:
+Instead, clone the repository at the latest release tag, build with cargo, and copy the resulting
+executable to the desired location:
 
 ```
 git clone https://github.com/jonasmalacofilho/post-clock --branch v0.1.1
@@ -75,6 +75,9 @@ cd post-clock
 cargo build --release
 sudo install -Dm0755 -t /usr/local/bin/ target/release/post-clock
 ```
+
+_(It you know of a simpler way to install binary crates to global paths like `/usr/bin` or
+`/usr/local/bin`, please open an issue and let me know)._
 
 ## Running as a service
 
