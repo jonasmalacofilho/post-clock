@@ -16,16 +16,17 @@ However, it's also possible for the kernel and userspace to write arbitrary byte
 and, if the POST code display hasn't been switched to a different input, have it display them.
 
 One small complication is that some programs, including the Linux kernel, may by default use writes
-to port 0x80 as a short delay timer.[^1][^2] But this behavior can be disabled: for example, Linux
-can be configured to use port 0xED instead, which is also generally safe.
+to port 0x80 as a short delay timer. But this behavior can be disabled: for example, Linux can be
+configured to use port 0xED instead, which is also generally safe. More on this in the following
+section.
 
 ## System requirements and preparation
 
-post-clock requires a recent Linux kernel and a x86 or x86-64 system.
+post-clock requires a x86 or x86-64 system and a Linux kernel with support for capabilities and
+configurable IO delay; in practice, Linux 4.3 or later is recommended.
 
 The kernel should be configured to use a port different than 0x80 for I/O delays, or no port at all.
-This can be done at build time with `CONFIG_IO_DELAY_0XED` and similar options or, more commonly,
-with the `io_delay` boot parameter:
+This can be done with the [`io_delay`] boot parameter:
 
 ```
 io_delay=       [X86] I/O delay method
@@ -38,6 +39,9 @@ io_delay=       [X86] I/O delay method
         none
                 No delay
 ```
+
+Alternatively, the IO delay type can be configured at kernel build time by selecting a different
+[`CONFIG_IO_DELAY_*`] option.
 
 Other programs using port 0x80 for short delays should also be configured to use some other port or
 delay mechanism.
@@ -58,8 +62,9 @@ Alternatively, post-clock can be executed as root.
 ## Manual installation
 
 Because post-clock requires the `CAP_SYS_RAWIO` capability to run, it generally shouldn't be
-installed in a user-writable location. This unfortunately also means that `cargo install post-clock`
-isn't a good fit.[^3]
+installed in a user-writable location. Therefore, simply running `cargo install post-clock` isn't
+recommended. And while it's possible to specify a different installation path, for example with
+`--root /usr/local/bin`, it would also _build_ post-clock as root, which isn't ideal.
 
 Instead, the recommended way to manually install post-clock is to clone the repository at the latest
 release tag, build with cargo, and copy the resulting executable to the desired location:
@@ -73,8 +78,10 @@ sudo install -Dm0755 -t /usr/local/bin/ target/release/post-clock
 
 ## Running as a service
 
-A systemd system service file is provided in [`post-clock.service`][.service]. After installing it
-to a suitable location,[^4] reload all unit files:
+A systemd system service file is provided in [`post-clock.service`][.service].
+
+After adjusting the path to the executable, install the service file to a suitable location (see
+[`systemd.unit(5)`][man:systemd.unit]) and reload all unit files:
 
 ```
 sudo install -Dm0644 -t /etc/systemd/system/ post-clock.service
@@ -87,16 +94,9 @@ Then, enable and start the service:
 sudo systemctl enable --now post-clock.service
 ```
 
-[^1]: http://www.faqs.org/docs/Linux-mini/IO-Port-Programming.html
-
-[^2]: https://www.kernel.org/doc/html/latest/admin-guide/kernel-parameters.html
-
-[^3]: While it's possible to pass `--root /usr/local/bin`, that would require running cargo as root,
-  and it would _build_ post-clock as root, which isn't advised.
-
-[^4]: See [`systemd.unit(5)`][man:systemd.unit].
-
 [.service]: https://github.com/jonasmalacofilho/post-clock/blob/main/post-clock.service
+[`CONFIG_IO_DELAY_*`]: https://github.com/torvalds/linux/blob/v6.2/arch/x86/Kconfig.debug#L123-L151
+[`io_delay`]: https://github.com/torvalds/linux/blob/v6.2/Documentation/admin-guide/kernel-parameters.txt#L2196-L2204
 [man:ioperm]: https://man7.org/linux/man-pages/man2/ioperm.2.html
 [man:systemd.unit]: https://man7.org/linux/man-pages/man5/systemd.unit.5.html
 [pkg:aur]: https://aur.archlinux.org/packages/post-clock
