@@ -2,7 +2,7 @@
 Description=POST codes display clock
 
 [Service]
-ExecStart=/usr/bin/post-clock
+ExecStart=/usr/local/bin/post-clock
 Nice=10
 
 # User and capabilities
