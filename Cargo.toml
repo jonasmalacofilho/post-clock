@@ -3,6 +3,7 @@ name = "post-clock"
 version = "0.1.1"
 authors = ["Jonas Malaco <jonas@protocubo.io>"]
 edition = "2021"
+rust-version = "1.63"
 description = "A clock using the POST codes display"
 repository = "https://github.com/jonasmalacofilho/post-clock"
 license = "Unlicense"
